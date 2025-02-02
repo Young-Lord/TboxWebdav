@@ -148,7 +148,7 @@ namespace TboxWebdav.Server.Modules.Tbox
         {
             var uniqueKey = _tokenProvider.GetUserToken().GetHashCode().ToString() + FullPath;
             var provider = _serviceProvider.GetService<TboxParameterResolverProvider>();
-            provider.SetPath(uniqueKey);
+            provider.SetPath(FullPath);
             provider.SetLength(long.Parse(_fileInfo.Size));
 
             SeekableWebStream stream = new SeekableWebStream(uniqueKey, long.Parse(_fileInfo.Size), webDataProvider, provider.ParameterResolver);

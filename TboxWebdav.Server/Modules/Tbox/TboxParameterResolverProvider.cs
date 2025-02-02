@@ -48,7 +48,7 @@ namespace TboxWebdav.Server.Modules.Tbox
             builder.Append($"/api/v1/file/{cred.LibraryId}/{cred.SpaceId}/{path.UrlEncodeByParts()}");
             builder.Append($"?access_token={cred.AccessToken}");
 
-            SeekableWebParameters para = new SeekableWebParameters(new Uri(builder.ToString()), path, 1024 * 1024);
+            SeekableWebParameters para = new SeekableWebParameters(new Uri(builder.ToString()));
             para.TimeoutInMilliseconds = 30 * 1000;
             para.HasRange = true;
             para.Method = HttpMethod.Get;
