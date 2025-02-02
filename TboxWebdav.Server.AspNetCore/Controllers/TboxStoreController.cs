@@ -125,6 +125,7 @@ namespace TboxWebdav.Server.AspNetCore.Controllers
         {
             if (webDavResult.HasDocument)
             {
+                Response.StatusCode = (int)webDavResult.StatusCode;
                 return new FileStreamResult(
                     XmlHelper.GetXmlStream(webDavResult.Document),
                     "text/xml; charset=\"utf-8\""
