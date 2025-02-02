@@ -21,13 +21,15 @@ namespace TboxWebdav.Server.Modules.Tbox
         private readonly IWebDavStoreContext _context;
         private readonly IServiceProvider _serviceProvider;
         private readonly TboxService _tbox;
+        private readonly TboxUserTokenProvider _tokenProvider;
 
-        public TboxStoreItem(ILogger<TboxStoreItem> logger, IWebDavStoreContext context, TboxService tbox, IServiceProvider serviceProvider)
+        public TboxStoreItem(ILogger<TboxStoreItem> logger, IWebDavStoreContext context, TboxService tbox, IServiceProvider serviceProvider, TboxUserTokenProvider tokenProvider)
         {
             _logger = logger;
             _context = context;
             _tbox = tbox;
             _serviceProvider = serviceProvider;
+            _tokenProvider = tokenProvider;
         }
 
         public void SetFileInfo(TboxFileInfoDto fileInfo)
@@ -144,11 +146,12 @@ namespace TboxWebdav.Server.Modules.Tbox
 
         public async Task<Stream> GetReadableStreamAsync(HttpContext httpContext, long? start, long? end)
         {
+            var uniqueKey = _tokenProvider.GetUserToken().GetHashCode().ToString() + FullPath;
             var provider = _serviceProvider.GetService<TboxParameterResolverProvider>();
-            provider.SetPath(FullPath);
+            provider.SetPath(uniqueKey);
             provider.SetLength(long.Parse(_fileInfo.Size));
 
-            SeekableWebStream stream = new SeekableWebStream(FullPath, long.Parse(_fileInfo.Size), webDataProvider, provider.ParameterResolver);
+            SeekableWebStream stream = new SeekableWebStream(uniqueKey, long.Parse(_fileInfo.Size), webDataProvider, provider.ParameterResolver);
             return stream;
 
             //var res = _tbox.GetFileStream(FullPath, start, end);

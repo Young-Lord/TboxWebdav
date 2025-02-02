@@ -30,72 +30,69 @@ namespace TboxWebdav.Server.Modules.Tbox.Services
             _client = _clientFactory.CreateClient();
         }
 
-        // Todo
-        //public CommonResult LoginUseJaccount()
-        //{
-        //    HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, "https://pan.sjtu.edu.cn/user/v1/sign-in/sso-login-redirect/xpw8ou8y");
-        //    string code = "";
-        //    try
-        //    {
-        //        var res = _client.SendAsync(req).GetAwaiter().GetResult();
+        public static CommonResult<TboxLoginResDto> LoginUseJaccount(HttpClient client)
+        {
+            HttpRequestMessage req = new HttpRequestMessage(HttpMethod.Get, "https://pan.sjtu.edu.cn/user/v1/sign-in/sso-login-redirect/xpw8ou8y?auto_redirect=true&from=web&custom_state=4ycSqbzfqM9mPuzOKmvTUQ%25253D%25253D");
 
-        //        if (!res.IsSuccessStatusCode)
-        //        {
-        //            return new CommonResult(false, $"服务器响应{res.StatusCode}");
-        //        }
+            string code = "";
+            try
+            {
+                var res = client.SendAsync(req).GetAwaiter().GetResult();
 
-        //        if (res.RequestMessage.RequestUri.Host.Contains("jaccount"))
-        //        {
-        //            return new CommonResult(false, $"未成功认证");
-        //        }
+                if (!res.IsSuccessStatusCode)
+                {
+                    return new (false, $"服务器响应{res.StatusCode}");
+                }
 
-        //        var reg = new Regex("code=(.+?)&state=");
-        //        var match = reg.Match(res.RequestMessage.RequestUri.OriginalString);
+                if (res.RequestMessage.RequestUri.Host.Contains("jaccount"))
+                {
+                    return new (false, $"未成功认证");
+                }
 
-        //        if (!match.Success)
-        //        {
-        //            return new CommonResult(false, $"未找到回调code");
-        //        }
-        //        code = match.Groups[1].Value;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new CommonResult(false, ex.Message);
-        //    }
+                var reg = new Regex("code=(.+?)&state=");
+                var match = reg.Match(res.RequestMessage.RequestUri.OriginalString);
 
-        //    ///user/v1/sign-in/verify-account-login/xpw8ou8y
-        //    req = new HttpRequestMessage(HttpMethod.Post, $"https://pan.sjtu.edu.cn/user/v1/sign-in/verify-account-login/xpw8ou8y?device_id=Chrome+116.0.0.0&type=sso&credential={code}");
+                if (!match.Success)
+                {
+                    return new (false, $"未找到回调code");
+                }
+                code = match.Groups[1].Value;
+            }
+            catch (Exception ex)
+            {
+                return new (false, ex.Message);
+            }
 
-        //    try
-        //    {
-        //        var res = _client.SendAsync(req).GetAwaiter().GetResult();
+            req = new HttpRequestMessage(HttpMethod.Post, $"https://pan.sjtu.edu.cn/user/v1/sign-in/verify-account-login/xpw8ou8y?device_id=Chrome+116.0.0.0&type=sso&credential={code}");
 
-        //        if (!res.IsSuccessStatusCode)
-        //        {
-        //            return new CommonResult(false, $"服务器响应{res.StatusCode}");
-        //        }
+            try
+            {
+                var res = client.SendAsync(req).GetAwaiter().GetResult();
 
-        //        var body = res.Content.ReadAsStringAsync().Result;
-        //        var json = JsonConvert.DeserializeObject<TboxLoginResDto>(body);
+                if (!res.IsSuccessStatusCode)
+                {
+                    return new (false, $"服务器响应{res.StatusCode}");
+                }
 
-        //        if (json.Status != 0)
-        //        {
-        //            return new CommonResult(false, $"服务器返回失败：{json.Message}");
-        //        }
+                var body = res.Content.ReadAsStringAsync().Result;
+                var json = JsonConvert.DeserializeObject<TboxLoginResDto>(body);
 
-        //        if (json.UserToken.Length != 128)
-        //        {
-        //            return new CommonResult(false, $"UserToken无效");
-        //        }
+                if (json.Status != 0)
+                {
+                    return new (false, $"服务器返回失败：{json.Message}");
+                }
 
-        //        UserToken = json.UserToken;
-        //        return new CommonResult(true, "");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new CommonResult(false, ex.Message);
-        //    }
-        //}
+                if (json.UserToken.Length != 128)
+                {
+                    return new (false, $"UserToken无效");
+                }
+                return new (true, "", json);
+            }
+            catch (Exception ex)
+            {
+                return new (false, ex.Message);
+            }
+        }
 
         public CommonResult<TboxSpaceCred> GetSpace()
         {
@@ -824,7 +821,7 @@ namespace TboxWebdav.Server.Modules.Tbox.Services
 
         private TboxSpaceCred CheckLogined()
         {
-            if (UserToken == null) 
+            if (string.IsNullOrEmpty(UserToken)) 
                 throw new Exception("未登录");
             var cred = _credProvider.GetSpaceCred(UserToken);
             if (cred == null)

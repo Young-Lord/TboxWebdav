@@ -1,6 +1,0 @@
-@TboxWebdav.Server.AspNetCore_HostAddress = http://localhost:5047
-
-GET {{TboxWebdav.Server.AspNetCore_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

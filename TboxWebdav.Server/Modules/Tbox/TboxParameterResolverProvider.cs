@@ -36,7 +36,7 @@ namespace TboxWebdav.Server.Modules.Tbox
 
         public SeekableWebParameters ParameterResolver(long start)
         {
-            if (UserToken == null)
+            if (string.IsNullOrEmpty(UserToken))
                 throw new Exception("未登录");
             var cred = _credProvider.GetSpaceCred(UserToken);
 
