@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using TboxWebdav.Server.Modules.Webdav;
 using TboxWebdav.Server.Modules.Webdav.Internal;
 using TboxWebdav.Server.Modules.Webdav.Internal.Helpers;
@@ -19,6 +20,15 @@ namespace TboxWebdav.Server.Handlers
     /// </remarks>
     public class MoveHandler : IWebDavHandler
     {
+        private readonly ILogger<MoveHandler> _logger;
+        private readonly IWebDavContext _webDavContext;
+
+        public MoveHandler(ILogger<MoveHandler> logger, IWebDavContext webDavContext)
+        {
+            _logger = logger;
+            _webDavContext = webDavContext;
+        }
+
         /// <summary>
         /// Handle a MOVE request.
         /// </summary>
@@ -38,12 +48,10 @@ namespace TboxWebdav.Server.Handlers
             var request = httpContext.Request;
             var response = httpContext.Response;
 
-            //Todo
-            //if (!Config.AccessMode.CheckAccess(JboxAccessMode.move))
-            //{
-            //    response.SetStatus(DavStatusCode.Forbidden);
-            //    return true;
-            //}
+            if (_webDavContext.GetAccessMode() == Models.AppAccessMode.ReadOnly)
+            {
+                return new WebDavResult(DavStatusCode.Forbidden);
+            }
 
             // We should always move the item from a parent container
             var splitSourceUri = RequestHelper.SplitUri(new Uri(request.GetDisplayUrl()));

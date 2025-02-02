@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -22,6 +23,15 @@ namespace TboxWebdav.Server.Handlers
     /// </remarks>
     public class CopyHandler : IWebDavHandler
     {
+        private readonly ILogger<CopyHandler> _logger;
+        private readonly IWebDavContext _webDavContext;
+
+        public CopyHandler(ILogger<CopyHandler> logger, IWebDavContext webDavContext)
+        {
+            _logger = logger;
+            _webDavContext = webDavContext;
+        }
+
         /// <summary>
         /// Handle a COPY request.
         /// </summary>
@@ -40,6 +50,11 @@ namespace TboxWebdav.Server.Handlers
             // Obtain request and response
             var request = httpContext.Request;
             var response = httpContext.Response;
+
+            if (_webDavContext.GetAccessMode() == Models.AppAccessMode.ReadOnly)
+            {
+                return new WebDavResult(DavStatusCode.Forbidden);
+            }
 
             // Obtain the destination
             var destinationUri = request.GetDestinationUri();

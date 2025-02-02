@@ -16,6 +16,9 @@ namespace TboxWebdav.Server.AspNetCore.Models
         public List<AppCmdCustomUser> Users { get; set; }
         public bool IsError { get; set; }
         public string Message { get; set; }
+        public string? Cookie { get; set; }
+        public string? UserToken { get; set; }
+        public AppAccessMode AccessMode { get; set; }
     }
 
     public class AppCmdCustomUser
@@ -90,20 +93,37 @@ namespace TboxWebdav.Server.AspNetCore.Models
                 opt.Message = "使用 --auth Custom 时，必须指定 --username 用于 WebDav 服务认证。（密码可为空，但不推荐！）";
                 return opt;
             }
-            if (opt.AuthMode == AppAuthMode.Custom && (cookie == null && userToken == null))
+            if (opt.AuthMode == AppAuthMode.Custom && (userToken == null && cookie == null))
             {
                 opt.IsError = true;
                 opt.Message = "使用 --auth Custom 时，必须指定 --cookie 或者 --token 用于新云盘认证。";
                 return opt;
             }
-            opt.Users.Add(new AppCmdCustomUser()
+            if (opt.AuthMode == AppAuthMode.JaCookie
+                || opt.AuthMode == AppAuthMode.UserToken
+                || opt.AuthMode == AppAuthMode.Mixed
+                )
             {
-                AccessMode = accessMode,
-                Cookie = cookie,
-                Password = password,
-                UserName = userName,
-                UserToken = userToken,
-            });
+                opt.AccessMode = accessMode;
+            }
+            if (opt.AuthMode == AppAuthMode.None)
+            {
+                opt.AccessMode = accessMode;
+                opt.UserToken = userToken;
+                opt.Cookie = cookie;
+            }
+            if (opt.AuthMode == AppAuthMode.Custom
+                || (opt.AuthMode == AppAuthMode.Mixed && userName != null))
+            {
+                opt.Users.Add(new AppCmdCustomUser()
+                {
+                    AccessMode = accessMode,
+                    Cookie = cookie,
+                    Password = password,
+                    UserName = userName,
+                    UserToken = userToken,
+                });
+            }
             return opt;
         }
     }

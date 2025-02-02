@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using TboxWebdav.Server.Modules.Webdav;
 using TboxWebdav.Server.Modules.Webdav.Internal;
 using TboxWebdav.Server.Modules.Webdav.Internal.Helpers;
@@ -19,6 +20,15 @@ namespace TboxWebdav.Server.Handlers
     /// </remarks>
     public class DeleteHandler : IWebDavHandler
     {
+        private readonly ILogger<DeleteHandler> _logger;
+        private readonly IWebDavContext _webDavContext;
+
+        public DeleteHandler(ILogger<DeleteHandler> logger, IWebDavContext webDavContext)
+        {
+            _logger = logger;
+            _webDavContext = webDavContext;
+        }
+
         /// <summary>
         /// Handle a DELETE request.
         /// </summary>
@@ -38,12 +48,11 @@ namespace TboxWebdav.Server.Handlers
             var request = httpContext.Request;
             var response = httpContext.Response;
 
-            //Todo
-            //if (!Config.AccessMode.CheckAccess(JboxAccessMode.delete))
-            //{
-            //    response.SetStatus(DavStatusCode.Forbidden);
-            //    return true;
-            //}
+            if (_webDavContext.GetAccessMode() == Models.AppAccessMode.ReadOnly
+                || _webDavContext.GetAccessMode() == Models.AppAccessMode.NoDelete)
+            {
+                return new WebDavResult(DavStatusCode.Forbidden);
+            }
 
             // We should always remove the item from a parent container
             var splitUri = RequestHelper.SplitUri(new Uri(request.GetDisplayUrl()));

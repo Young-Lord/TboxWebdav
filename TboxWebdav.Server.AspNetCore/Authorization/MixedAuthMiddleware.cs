@@ -15,21 +15,19 @@ public class MixedAuthMiddleware
     {
         if (AppCmdOption.Default.AuthMode == AppAuthMode.None)
         {
-            var user = AppCmdOption.Default.Users.FirstOrDefault(u => u.UserName == null && u.Password == null);
-            if (user != null)
+            if (AppCmdOption.Default.UserToken != null)
             {
-                if (user.UserToken != null)
-                {
-                    context.Items["UserToken"] = user.UserToken;
-                    await _next(context);
-                    return;
-                }
-                else if (user.Cookie != null)
-                {
-                    context.Items["JaCookie"] = user.Cookie;
-                    await _next(context);
-                    return;
-                }
+                context.Items["UserToken"] = AppCmdOption.Default.UserToken;
+                context.Items["AccessMode"] = AppCmdOption.Default.AccessMode.ToString();
+                await _next(context);
+                return;
+            }
+            else if (AppCmdOption.Default.Cookie != null)
+            {
+                context.Items["JaCookie"] = AppCmdOption.Default.Cookie;
+                context.Items["AccessMode"] = AppCmdOption.Default.AccessMode.ToString();
+                await _next(context);
+                return;
             }
             await SendUnauthorizedResponse(context);
             return;
@@ -64,12 +62,14 @@ public class MixedAuthMiddleware
         if (IsValidUserToken(password) && (AppCmdOption.Default.AuthMode == AppAuthMode.UserToken || AppCmdOption.Default.AuthMode == AppAuthMode.Mixed))
         {
             context.Items["UserToken"] = password;
+            context.Items["AccessMode"] = AppCmdOption.Default.AccessMode.ToString();
             await _next(context);
             return;
         }
         if (IsValidJaCookie(password) && (AppCmdOption.Default.AuthMode == AppAuthMode.JaCookie || AppCmdOption.Default.AuthMode == AppAuthMode.Mixed))
         {
             context.Items["JaCookie"] = password;
+            context.Items["AccessMode"] = AppCmdOption.Default.AccessMode.ToString();
             await _next(context);
             return;
         }
@@ -81,12 +81,14 @@ public class MixedAuthMiddleware
                 if (user.UserToken != null)
                 {
                     context.Items["UserToken"] = user.UserToken;
+                    context.Items["AccessMode"] = user.AccessMode.ToString();
                     await _next(context);
                     return;
                 }
                 else if (user.Cookie != null)
                 {
                     context.Items["JaCookie"] = user.Cookie;
+                    context.Items["AccessMode"] = user.AccessMode.ToString();
                     await _next(context);
                     return;
                 }

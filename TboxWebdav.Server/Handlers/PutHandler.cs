@@ -21,9 +21,12 @@ namespace TboxWebdav.Server.Handlers
     {
         private readonly ILogger<PutHandler> _logger;
 
-        public PutHandler(ILogger<PutHandler> logger)
+        private readonly IWebDavContext _webDavContext;
+
+        public PutHandler(ILogger<PutHandler> logger, IWebDavContext webDavContext)
         {
             _logger = logger;
+            _webDavContext = webDavContext;
         }
         /// <summary>
         /// Handle a PUT request.
@@ -44,12 +47,10 @@ namespace TboxWebdav.Server.Handlers
             var request = httpContext.Request;
             var response = httpContext.Response;
 
-            //Todo
-            //if (!Config.AccessMode.CheckAccess(JboxAccessMode.upload))
-            //{
-            //    response.SetStatus(DavStatusCode.Forbidden);
-            //    return true;
-            //}S
+            if (_webDavContext.GetAccessMode() == Models.AppAccessMode.ReadOnly)
+            {
+                return new WebDavResult(DavStatusCode.Forbidden);
+            }
 
             // It's not a collection, so we'll try again by fetching the item in the parent collection
             var splitUri = RequestHelper.SplitUri(new Uri(request.GetDisplayUrl()));

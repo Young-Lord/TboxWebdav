@@ -20,10 +20,12 @@ namespace TboxWebdav.Server.Handlers
     public class MkcolHandler : IWebDavHandler
     {
         private readonly ILogger<MkcolHandler> _logger;
+        private readonly IWebDavContext _webDavContext;
 
-        public MkcolHandler(ILogger<MkcolHandler> logger)
+        public MkcolHandler(ILogger<MkcolHandler> logger, IWebDavContext webDavContext)
         {
             _logger = logger;
+            _webDavContext = webDavContext;
         }
         /// <summary>
         /// Handle a MKCOL request.
@@ -44,12 +46,10 @@ namespace TboxWebdav.Server.Handlers
             var request = httpContext.Request;
             var response = httpContext.Response;
 
-            //Todo
-            //if (!Config.AccessMode.CheckAccess(JboxAccessMode.create))
-            //{
-            //    response.SetStatus(DavStatusCode.Forbidden);
-            //    return true;
-            //}
+            if (_webDavContext.GetAccessMode() == Models.AppAccessMode.ReadOnly)
+            {
+                return new WebDavResult(DavStatusCode.Forbidden);
+            }
 
             // The collection must always be created inside another collection
             var splitUri = RequestHelper.SplitUri(new Uri(request.GetDisplayUrl()));
