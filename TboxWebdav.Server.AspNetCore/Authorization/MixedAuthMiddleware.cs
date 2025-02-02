@@ -75,7 +75,7 @@ public class MixedAuthMiddleware
         }
         if (AppCmdOption.Default.AuthMode == AppAuthMode.Custom || AppCmdOption.Default.AuthMode == AppAuthMode.Mixed)
         {
-            var user = AppCmdOption.Default.Users.FirstOrDefault(u => u.UserName != null && u.UserName == username && u.Password == password);
+            var user = AppCmdOption.Default.Users.FirstOrDefault(u => u.UserName != null && u.UserName == username && (u.Password == null || (u.Password != null && u.Password == password)));
             if (user != null)
             {
                 if (user.UserToken != null)

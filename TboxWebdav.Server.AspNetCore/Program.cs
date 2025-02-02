@@ -17,7 +17,7 @@ namespace TboxWebdav.Server.AspNetCore
         {
             var configFileOption = new Option<FileInfo?>(
                 aliases: new string[] { "--config", "-c" },
-                description: "指定一个 YAML 格式的配置文件，可以替代命令行参数。"
+                description: "指定一个 YAML 格式的配置文件。使用配置文件时，其他命令行参数全部无效。"
             );
             var portOption = new Option<int>(
                 aliases: new string[] { "--port", "-p" },
@@ -106,13 +106,8 @@ namespace TboxWebdav.Server.AspNetCore
             {
                 options.Limits.MaxRequestBodySize = int.MaxValue;
             });
-            // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
             builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddTransient<IStoreCollection, TboxStoreCollection>();
@@ -149,11 +144,9 @@ namespace TboxWebdav.Server.AspNetCore
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                //app.UseSwagger();
-                //app.UseSwaggerUI();
+
             }
             app.UseAuthorization();
             app.UseMiddleware<MixedAuthMiddleware>();
