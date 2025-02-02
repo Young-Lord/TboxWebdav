@@ -8,6 +8,7 @@ using TboxWebdav.Server.Modules.Webdav.Internal;
 using TboxWebdav.Server.Modules.Webdav.Internal.Stores;
 using System.CommandLine;
 using TboxWebdav.Server.AspNetCore.Models;
+using TboxWebdav.Server.AspNetCore.Middlewares;
 
 namespace TboxWebdav.Server.AspNetCore
 {
@@ -28,6 +29,11 @@ namespace TboxWebdav.Server.AspNetCore
                 aliases: new string[] { "--host", "-h" },
                 getDefaultValue: () => "localhost",
                 description: "指定 HTTP 服务监听的主机名或 IP 地址。"
+            );
+            var cacheSizeOption = new Option<int>(
+                aliases: new string[] { "--cachesize" },
+                getDefaultValue: () => 20 * 1024 * 1024,
+                description: "指定缓存空间的大小（不建议小于 10MB）。"
             );
             var authModeOption = new Option<AppAuthMode>(
                 aliases: new string[] { "--auth" },
@@ -61,12 +67,13 @@ namespace TboxWebdav.Server.AspNetCore
                 aliases: new string[] { "--access" },
                 getDefaultValue: () => AppAccessMode.Full,
                 description: "指定对于 新云盘 的访问权限。"
-            );
+            );     
 
             var rootCommand = new RootCommand("Welcome to TboxWebdav!");
             rootCommand.AddOption(configFileOption);
             rootCommand.AddOption(portOption);
             rootCommand.AddOption(hostOption);
+            rootCommand.AddOption(cacheSizeOption);
             rootCommand.AddOption(authModeOption);
             rootCommand.AddOption(userNameOption);
             rootCommand.AddOption(passwordOption);
@@ -81,6 +88,7 @@ namespace TboxWebdav.Server.AspNetCore
                 configFileOption,
                 portOption,
                 hostOption,
+                cacheSizeOption,
                 authModeOption,
                 userNameOption,
                 passwordOption,
@@ -150,6 +158,7 @@ namespace TboxWebdav.Server.AspNetCore
             }
             app.UseAuthorization();
             app.UseMiddleware<MixedAuthMiddleware>();
+            app.UseMiddleware<ExtraInfoMiddleware>();
 
             app.MapControllers();
 

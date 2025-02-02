@@ -112,6 +112,6 @@ public class MixedAuthMiddleware
     {
         context.Response.StatusCode = 401; // Unauthorized
         context.Response.Headers["WWW-Authenticate"] = "Basic";
-        await context.Response.WriteAsync("Unauthorized");
+        //await context.Response.WriteAsync("Unauthorized");
     }
 }

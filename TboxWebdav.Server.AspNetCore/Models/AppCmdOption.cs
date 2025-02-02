@@ -8,10 +8,9 @@ namespace TboxWebdav.Server.AspNetCore.Models
     public class AppCmdOption
     {
         public static AppCmdOption Default { get; set; }
-
-        public FileInfo? ConfigFile { get; set; }
         public int Port { get; set; }
         public string Host { get; set; }
+        public int CacheSize { get; set; }
         public AppAuthMode AuthMode { get; set; }
         public List<AppCmdCustomUser> Users { get; set; }
         public bool IsError { get; set; }
@@ -25,6 +24,7 @@ namespace TboxWebdav.Server.AspNetCore.Models
     {
         public int Port { get; set; } = 65472;
         public string Host { get; set; } = "localhost";
+        public int CacheSize { get; set; } = 20 * 1024 * 1024;
         public AppAuthMode AuthMode { get; set; } = AppAuthMode.Mixed;
         public List<AppCmdCustomUser> Users { get; set; }
         public string? Cookie { get; set; }
@@ -46,6 +46,7 @@ namespace TboxWebdav.Server.AspNetCore.Models
         private readonly Option<FileInfo?> _configFileOption;
         private readonly Option<int> _portOption;
         private readonly Option<string> _hostOption;
+        private readonly Option<int> _cacheSizeOption;
         private readonly Option<AppAuthMode> _authModeOption;
         private readonly Option<string?> _userNameOption;
         private readonly Option<string?> _passwordOption;
@@ -57,6 +58,7 @@ namespace TboxWebdav.Server.AspNetCore.Models
             Option<FileInfo?> configFileOption,
             Option<int> portOption,
             Option<string> hostOption,
+            Option<int> cacheSizeOption,
             Option<AppAuthMode> authModeOption,
             Option<string?> userNameOption,
             Option<string?> passwordOption,
@@ -67,6 +69,7 @@ namespace TboxWebdav.Server.AspNetCore.Models
             _configFileOption = configFileOption;
             _portOption = portOption;
             _hostOption = hostOption;
+            _cacheSizeOption = cacheSizeOption;
             _authModeOption = authModeOption;
             _userNameOption = userNameOption;
             _passwordOption = passwordOption;
@@ -95,6 +98,7 @@ namespace TboxWebdav.Server.AspNetCore.Models
                 Port = bindingContext.ParseResult.GetValueForOption(_portOption),
                 Host = bindingContext.ParseResult.GetValueForOption(_hostOption),
                 AuthMode = bindingContext.ParseResult.GetValueForOption(_authModeOption),
+                CacheSize = bindingContext.ParseResult.GetValueForOption(_cacheSizeOption),
                 Users = new List<AppCmdCustomUser>(),
             };
 
@@ -201,6 +205,7 @@ namespace TboxWebdav.Server.AspNetCore.Models
                     }
                 opt.Host = root.Host;
                 opt.Port = root.Port;
+                opt.CacheSize = root.CacheSize;
                 opt.Users = root.Users;
                 opt.AuthMode = root.AuthMode;
                 opt.AccessMode = root.AccessMode;

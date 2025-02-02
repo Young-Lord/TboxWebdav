@@ -10,5 +10,6 @@ namespace TboxWebdav.Server.Modules.Webdav
     public interface IWebDavContext
     {
         AppAccessMode GetAccessMode();
+        int GetCacheSize();
     }
 }
