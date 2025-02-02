@@ -59,14 +59,14 @@ public class MixedAuthMiddleware
         var username = usernamePassword.Split(':')[0];
         var password = usernamePassword.Split(':')[1];
 
-        if (IsValidUserToken(password) && (AppCmdOption.Default.AuthMode == AppAuthMode.UserToken || AppCmdOption.Default.AuthMode == AppAuthMode.Mixed))
+        if ((AppCmdOption.Default.AuthMode == AppAuthMode.UserToken || AppCmdOption.Default.AuthMode == AppAuthMode.Mixed) && IsValidUserToken(password))
         {
             context.Items["UserToken"] = password;
             context.Items["AccessMode"] = AppCmdOption.Default.AccessMode.ToString();
             await _next(context);
             return;
         }
-        if (IsValidJaCookie(password) && (AppCmdOption.Default.AuthMode == AppAuthMode.JaCookie || AppCmdOption.Default.AuthMode == AppAuthMode.Mixed))
+        if ((AppCmdOption.Default.AuthMode == AppAuthMode.JaCookie || AppCmdOption.Default.AuthMode == AppAuthMode.Mixed) && IsValidJaCookie(password))
         {
             context.Items["JaCookie"] = password;
             context.Items["AccessMode"] = AppCmdOption.Default.AccessMode.ToString();
@@ -104,15 +104,8 @@ public class MixedAuthMiddleware
     
     private bool IsValidJaCookie(string password)
     {
-        try
-        {
-            var test = Convert.FromBase64String(password);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
+        var test = Convert.TryFromBase64String(password, new Span<byte>(new byte[password.Length]), out var _);
+        return test;
     }
 
     private async Task SendUnauthorizedResponse(HttpContext context)
