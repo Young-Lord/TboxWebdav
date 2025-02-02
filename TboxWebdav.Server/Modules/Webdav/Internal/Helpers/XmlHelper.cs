@@ -41,7 +41,7 @@ namespace TboxWebdav.Server.Modules.Webdav.Internal.Helpers
 #else
                     Indent = false,
 #endif
-                Encoding = System.Text.Encoding.UTF8,
+                Encoding = new UTF8Encoding(false),
             }))
             {
                 // Add the namespaces (Win7 WebDAV client requires them like this)
