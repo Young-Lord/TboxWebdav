@@ -32,7 +32,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: TboxWebdav.Server.AspNetCore-${{ matrix.rid }}-${{ matrix.build_configuration }}
+          name: TboxWebdav.Server.AspNetCore-${{ matrix.rid }}-${{ matrix.build_configuration }}-${{ matrix.deploy_mode }}
           path: TboxWebdav.Server.AspNetCore/bin/${{ matrix.build_configuration }}/net8.0/${{ matrix.rid }}/publish/
 
       - name: Pack Release Asset
