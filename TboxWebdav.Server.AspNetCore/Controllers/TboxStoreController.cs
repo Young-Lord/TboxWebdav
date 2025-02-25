@@ -146,6 +146,10 @@ namespace TboxWebdav.Server.AspNetCore.Controllers
                 Response.StatusCode = (int)webDavResult.StatusCode;
                 //Response.Body = null;
                 return new EmptyResult();
+            }            
+            else if (webDavResult.HasContent)
+            {
+                return new ContentResult() { Content = webDavResult.Content, ContentType = "text/html", StatusCode = (int)webDavResult.StatusCode };
             }
             else
             {

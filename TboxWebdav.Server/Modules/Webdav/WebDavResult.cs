@@ -32,9 +32,11 @@ namespace TboxWebdav.Server.Modules.Webdav
         public bool IsFile { get; set; }
         public bool IsError { get; set; }
         public bool HasDocument { get; set; }
+        public bool HasContent { get; set; }
         public string Message { get; set; }
         public DavStatusCode StatusCode { get; set; }
         public Stream FileStream { get; set; }
+        public string Content { get; set; }
         public XDocument Document { get; set; }
         public string FileType { get; set; }
         public string FileName { get; set; }

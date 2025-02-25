@@ -60,15 +60,11 @@ namespace TboxWebdav.Server.Handlers
                 return new WebDavResult(DavStatusCode.NotFound, "not found");
             }
 
-            //if (entry is TboxStoreCollection collection && collection.FullPath == "/")
-            //{
-            //    var htmlstr = "<div style=\"width: 400px; height: 200px; margin: auto auto; \">TboxWebdav Server Running!</div>";
-            //    var htmlstream = new MemoryStream(Encoding.UTF8.GetBytes(htmlstr));
-            //    response.SetHeaderValue("Content-Length", $"{htmlstream.Length}");
-            //    await CopyToAsync(htmlstream, response.Stream, range?.Start ?? 0, range?.End).ConfigureAwait(false);
-            //    response.SetStatus(DavStatusCode.Ok);
-            //    return true;
-            //}
+            if (entry is TboxStoreCollection collection && collection.FullPath.Trim('/') == "")
+            {
+                var htmlstr = "<div style=\"width: 400px; height: 200px; margin: auto auto; \">TboxWebdav Server Running!</div>";
+                return new WebDavResult(DavStatusCode.Ok) { HasContent = true, Content = htmlstr };
+            }
 
             // ETag might be used for a conditional request
             string etag = null;
