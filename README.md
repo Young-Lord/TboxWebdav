@@ -15,6 +15,9 @@
 ## 下载
 本程序为便携版程序，仅提供命令行界面。请在 [Github Releases](https://github.com/1357310795/TboxWebdav/releases) 下载后直接运行。
 
+- 若选择“with-runtime”类型的二进制程序包，则下载后可以直接运行
+- 若选择“no-runtime”类型的二进制程序包，则下载后还需要安装 [ASP.NET Core Runtime 8.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-aspnetcore-8.0.13-windows-x64-installer) 和 [.NET Runtime 8.0](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-8.0.13-windows-x64-installer) 才可以运行
+
 ## 使用
 - 【方式一】使用默认参数，直接运行程序（推荐）
 连接时随便输入一个用户名，密码可以用 JAAuthCookie 或者 UserToken
