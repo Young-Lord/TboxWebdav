@@ -291,7 +291,7 @@ namespace TboxWebdav.Server.Modules.Webdav.Internal.Helpers
         public static async Task<XDocument> LoadXmlDocumentAsync(this HttpRequest request)
         {
             // If there is no input stream, then there is no XML document
-            if (request.Body == null || request.Body == Stream.Null)
+            if (request.Body == null || request.Body == Stream.Null || request.ContentLength == null || request.ContentLength == 0)
                 return null;
 
             // Return null if no content has been specified
