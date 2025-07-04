@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Logging;
+using TboxWebdav.Server.Modules.Tbox;
 using TboxWebdav.Server.Modules.Webdav;
 using TboxWebdav.Server.Modules.Webdav.Internal;
 using TboxWebdav.Server.Modules.Webdav.Internal.Helpers;
@@ -59,6 +60,12 @@ namespace TboxWebdav.Server.Handlers
             {
                 // Set status to not found
                 return new WebDavResult(DavStatusCode.NotFound, "not found");
+            }
+
+            if (entry is TboxStoreCollection collection)
+            {
+                response.SetHeaderValue("Content-Length", "0");
+                return new WebDavResult(DavStatusCode.MultiStatus) { HasContent = false };
             }
 
             // ETag might be used for a conditional request
