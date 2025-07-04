@@ -112,7 +112,7 @@ namespace TboxWebdav.Server.AspNetCore
 
             builder.Services.Configure<KestrelServerOptions>(options =>
             {
-                options.Limits.MaxRequestBodySize = int.MaxValue;
+                options.Limits.MaxRequestBodySize = 20L * 1024 * 1024 * 1024;
             });
 
             builder.Services.AddControllers();
