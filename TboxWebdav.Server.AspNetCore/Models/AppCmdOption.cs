@@ -188,6 +188,12 @@ namespace TboxWebdav.Server.AspNetCore.Models
                     return opt;
                 }
                 if (root.AuthMode == AppAuthMode.Custom || root.AuthMode == AppAuthMode.Mixed)
+                    if (root.Users == null)
+                    {
+                        opt.IsError = true;
+                        opt.Message = "使用 AuthMode: Custom 或 Mixed 时，必须使用 Users 指定用于 WebDav 服务认证的自定义用户。";
+                        return opt;
+                    }
                     foreach (var user in root.Users)
                     {
                         if (user.UserName == null)
