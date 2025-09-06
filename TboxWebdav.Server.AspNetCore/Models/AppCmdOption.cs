@@ -187,13 +187,7 @@ namespace TboxWebdav.Server.AspNetCore.Models
                     opt.Message = "使用 AuthMode: None 时，必须指定 Cookie 或者 UserToken 用于新云盘认证。";
                     return opt;
                 }
-                if (root.AuthMode == AppAuthMode.Custom || root.AuthMode == AppAuthMode.Mixed)
-                    if (root.Users == null)
-                    {
-                        opt.IsError = true;
-                        opt.Message = "使用 AuthMode: Custom 或 Mixed 时，必须使用 Users 指定用于 WebDav 服务认证的自定义用户。";
-                        return opt;
-                    }
+                if ((root.AuthMode == AppAuthMode.Custom || root.AuthMode == AppAuthMode.Mixed) && root.Users != null)
                     foreach (var user in root.Users)
                     {
                         if (user.UserName == null)
